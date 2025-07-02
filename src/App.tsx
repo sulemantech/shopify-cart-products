@@ -48,9 +48,50 @@ function App() {
       currency: 'PKR',
     }).format(amount);
 
+  const handlePrint = () => window.print();
+
+  const handleExportCSV = () => {
+    const rows = [
+      ['Product Title', 'Price', 'Quantity', 'Total'],
+      ...products.map((p) => [
+        p.title,
+        p.price,
+        p.quantity,
+        p.price * p.quantity,
+      ]),
+    ];
+
+    const csvContent =
+      'data:text/csv;charset=utf-8,' +
+      rows.map((e) => e.join(',')).join('\n');
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', 'cart_products.csv');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const handleShare = async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      alert('Link copied to clipboard!');
+    } catch (err) {
+      console.error('Failed to copy link:', err);
+    }
+  };
+
   return (
     <div className="cart-container">
-      <h1>Shopping Cart</h1>
+      <h1>🛒 Shopping Cart</h1>
+
+      <div className="action-buttons">
+        <button onClick={handlePrint}>🖨️ Print</button>
+        <button onClick={handleExportCSV}>📤 Export CSV</button>
+        <button onClick={handleShare}>🔗 Share</button>
+      </div>
 
       <div className="cart-header">
         <span>Product</span>
